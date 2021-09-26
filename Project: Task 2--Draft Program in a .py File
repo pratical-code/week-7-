@@ -1,53 +1,66 @@
-# This is a header for the application
-# You should read this header and insert your name and your date below as part of the peer review
-# This is a typical part of any program
-# Author: Dylan Kirkeby-Carlyle
-# Creation Date: 9/21/2021
-# Below is a simple program with 10 issues (some are syntax errors and some are logic errors.  You need to identify the issues and correct them.
-
-import random
-import time
-
-def displayIntro():
-    print('''You are in a land full of dragons. In front of you,
-    you see two caves. In one cave, the dragon is friendly
-    and will share his treasure with you. The other dragon
-    is greedy and hungry, and will eat you on sight.''')
-    print()
-
-def chooseCave():
-    cave = ''
-    while cave != '1' and cave != '2':
-        print('Which cave will you go into? (1 or 2)')
-        cave = input()
-
-    return cave
-
-def checkCave(chosenCave):
-    print('You approach the cave...')
-    #sleep for 2 seconds
-    time.sleep(2)
-    print('It is dark and spooky...')
-    #sleep for 2 seconds
-    time.sleep(3)
-    print('A large dragon jumps out in front of you! He opens his jaws and...')
-    print()
-    #sleep for 2 seconds
-    time.sleep(2)
-    friendlyCave = random.randint(1, 2)
-
-    if chosenCave == str(friendlyCave):
-        print('Gives you his treasure!')
-    else:
-        print ('Gobbles you down in one bite!')
-
-playAgain = 'yes'
-while playAgain == 'yes' or playAgain == 'y':
-    displayIntro()
-    caveNumber = chooseCave()
-    checkCave(caveNumber)
-    
-    print('Do you want to play again? (yes or no)')
-    playAgain = input()
-    if playAgain == "no":
-        print("Thanks for planing")
+import requests
+ 
+base_url = "http://api.openweathermap.org/data/2.5/weather?appid=f3a435d84693e3912c1cd7b68b3580fd&units=imperial"
+country_code='us'
+def weather():
+ 
+    print("############ Weather App ##########")
+ 
+    while(True):
+        zip = input("Enter zipcode (Press enter to leave the field blank): ")
+        city = input("Enter city: ")
+        if (zip.strip() or city.strip()):
+            break
+        else:
+            print("enter valid city/zipcode")
+ 
+    #compose the url for the service
+    if city.strip():
+        #api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
+        complete_url = base_url + "&q=" + city
+    elif zip:
+        #api.openweathermap.org/data/2.5/weather?zip={zip code},{country code}&appid={API key}
+        complete_url = base_url + "&szip=" + zip + "," + country_code
+ 
+    #send a request to the service
+    y = getWeatherJson(complete_url)
+    #validate the response and print to output
+    if len(y) > 0:
+        current_temp = getTemperature(y)
+        current_pressure = getPressure(y)
+        current_humidity = getHumidity(y)
+        # current_time = y["currentDateTime"]
+ 
+        # print(current_time, "date time")
+        print ("++Successfully connected to the service++")
+        print(current_humidity, "humidity")
+        print(current_pressure, "pressure")
+        print(current_temp, "temp")
+ 
+ 
+def getWeatherJson(url):
+    try:
+        print("Connecting to the below url...")
+        print(url)
+        response = requests.get(url)
+        x = response.json()
+        y = x["main"]
+    except:
+        y = {}
+        print ("--Error connecting to the service--")
+ 
+    return y
+ 
+ 
+def getTemperature(json):
+    return json['temp']
+ 
+ 
+def getPressure(json):
+    return json["pressure"]
+ 
+ 
+def getHumidity(json):
+    return json["humidity"]
+ 
+weather()
